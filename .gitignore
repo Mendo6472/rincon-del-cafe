@@ -1,0 +1,11 @@
+node_modules/
+.env
+
+# Resultados y reportes de Playwright
+test/test-results/
+test/playwright-report/
+test/blob-report/
+test/.auth/
+
+# Log de la app cuando se levanta en el pipeline
+app.log

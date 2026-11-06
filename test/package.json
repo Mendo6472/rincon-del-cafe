@@ -1,0 +1,13 @@
+{
+  "name": "pruebas-cafe",
+  "private": true,
+  "type": "module",
+  "description": "Pruebas Playwright de la HU-09 Programa de puntos (El Rincón del Café)",
+  "scripts": {
+    "test": "playwright test",
+    "reporte": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0"
+  }
+}

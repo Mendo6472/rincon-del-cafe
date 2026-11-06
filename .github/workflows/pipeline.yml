@@ -1,0 +1,69 @@
+name: Pruebas de aceptación
+
+on:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+    branches: [ 'main' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas-aceptacion:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            app/package-lock.json
+            test/package-lock.json
+
+      - name: Instalar dependencias de la app
+        working-directory: app
+        run: npm ci
+
+      - name: Instalar dependencias de las pruebas
+        working-directory: test
+        run: npm ci
+
+      - name: Instalar Chromium para Playwright
+        working-directory: test
+        run: npx playwright install --with-deps chromium
+
+      - name: Levantar la app en el puerto 3000
+        working-directory: app
+        run: nohup npm start > ../app.log 2>&1 &
+
+      - name: Esperar a que la app responda
+        run: |
+          for intento in $(seq 1 30); do
+            if curl -sf http://localhost:3000 > /dev/null; then
+              echo "La app respondió en el intento $intento"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "La app no respondió en 60 segundos"
+          cat app.log
+          exit 1
+
+      - name: Ejecutar las pruebas @acceptanceTest
+        working-directory: test
+        run: npx playwright test --grep @acceptanceTest
+
+      - name: Subir el reporte de Playwright
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: test/playwright-report/
+          retention-days: 30
