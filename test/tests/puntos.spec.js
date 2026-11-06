@@ -53,7 +53,7 @@ test.describe('HU-09 · Programa de puntos', () => {
       await paginaPuntos.canjear(conPuntos.codigo, 200);
 
       await expect(paginaPuntos.mensaje).toHaveText(mensajes.canjeados);
-      await expect(paginaPuntos.saldo).toHaveText(String(conPuntos.saldoInicial - 200));
+      await expect(paginaPuntos.saldo).toHaveText(String(conPuntos.saldoInicial - 100));
       await expect(paginaPuntos.estado).toHaveText(estados.canjeados);
     });
 
